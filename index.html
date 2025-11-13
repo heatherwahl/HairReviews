@@ -945,12 +945,6 @@
       return arr;
     }
 
-    function uniquePush(arr, text){
-      const t = (text || "").trim();
-      if(!t) return;
-      if(!arr.includes(t)) arr.push(t);
-    }
-
     function joinSentences(lines){
       const cleaned = (lines || [])
         .map(l => (l || "").trim())
@@ -960,18 +954,6 @@
           return /[.!?]$/.test(l) ? l : l + ".";
         });
       return cleaned.join(" ");
-    }
-
-    function shuffleContainerChildren(selector){
-      const parent = document.querySelector(selector);
-      if(!parent) return;
-      const children = Array.from(parent.children);
-      if(children.length <= 1) return;
-      for(let i = children.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [children[i], children[j]] = [children[j], children[i]];
-      }
-      children.forEach(child => parent.appendChild(child));
     }
 
     async function copyToClipboard(text){
@@ -1004,11 +986,11 @@
       setTimeout(()=>{ el.style.display = "none"; }, 5000);
     }
 
+    // MORE RANDOMIZED REVIEW GENERATION
     function buildReviewText(){
       const opener = sample(OPENERS);
-      const middle = [];
 
-      // Collect selected tags
+      // Gather selected tags
       const selected = new Set();
       document.querySelectorAll(".tag").forEach(input => {
         if((input.type === "checkbox" || input.type === "radio") && input.checked){
@@ -1016,33 +998,54 @@
         }
       });
 
-      const groupsUsed = new Set();
-      const maxDetailSentences = 3;
+      // Map: group -> one randomly chosen sentence
+      const sentencesByGroup = {};
 
-      // Service sentence first (if chosen)
+      // Service sentence (program) handled first
       const programVal = document.querySelector('input[name="program"]:checked')?.value;
       if(programVal && TAG_VARIATIONS[programVal]){
-        const serviceSentence = sample(TAG_VARIATIONS[programVal]);
-        uniquePush(middle, serviceSentence);
-        groupsUsed.add("service");
+        sentencesByGroup["service"] = sample(TAG_VARIATIONS[programVal]);
       }
 
-      // Other selected tags, at most one sentence per group
+      // For all other selected tags, pick at most one sentence per group
       const selectedArray = Array.from(selected);
-      shuffleArray(selectedArray); // vary order a bit
+      shuffleArray(selectedArray); // random order of how we consider them
 
       for(const tag of selectedArray){
-        if(tag === programVal) continue; // already handled
+        if(tag === programVal) continue; // already accounted as service
 
         const group = TAG_GROUPS[tag] || tag;
-        if(groupsUsed.has(group)) continue;
+        if(sentencesByGroup[group]) continue; // already have a sentence for this group
         if(!TAG_VARIATIONS[tag]) continue;
 
-        const sentence = sample(TAG_VARIATIONS[tag]);
-        uniquePush(middle, sentence);
-        groupsUsed.add(group);
+        sentencesByGroup[group] = sample(TAG_VARIATIONS[tag]);
+      }
 
-        if(middle.length >= maxDetailSentences) break;
+      // Decide how many detail sentences to include (2–4), if possible
+      const groups = Object.keys(sentencesByGroup);
+      const detailGroups = groups.filter(g => g !== "service");
+      shuffleArray(detailGroups);
+
+      const hasService = !!sentencesByGroup["service"];
+      const minDetails = hasService ? 1 : 2;
+      const maxDetails = 4;
+      const availableDetailCount = detailGroups.length + (hasService ? 1 : 0);
+      const targetDetailCount = Math.min(
+        availableDetailCount,
+        Math.max(minDetails, 2 + Math.floor(Math.random() * 3)) // random 2–4
+      );
+
+      const middle = [];
+
+      // Optionally start with service if we have it
+      if(hasService){
+        middle.push(sentencesByGroup["service"]);
+      }
+
+      // Add detail groups until we hit the target count
+      for(const g of detailGroups){
+        if(middle.length >= targetDetailCount) break;
+        middle.push(sentencesByGroup[g]);
       }
 
       const closer = sample(CLOSERS_5);
@@ -1128,12 +1131,7 @@
     }
 
     (function init(){
-      shuffleContainerChildren("#step1 .options-grid");
-      shuffleContainerChildren("#step2 .options-grid");
-      shuffleContainerChildren("#step3 .options-grid");
-      shuffleContainerChildren("#step4 .options-grid");
-      shuffleContainerChildren("#step5 .options-grid");
-      shuffleContainerChildren("#step6 .options-grid");
+      // No option shuffling – keep order consistent for the user
 
       // Require at least one choice for steps 1–6
       requireSelection("#step1", "next1");
@@ -1152,12 +1150,12 @@
       document.getElementById("next6").addEventListener("click", () => { updatePreview(); nextStep(); });
 
       // Back buttons
-      document.getElementById("back2").addEventListener("click", prevStep);
-      document.getElementById("back3").addEventListener("click", prevStep);
-      document.getElementById("back4").addEventListener("click", prevStep);
-      document.getElementById("back5").addEventListener("click", prevStep);
-      document.getElementById("back6").addEventListener("click", prevStep);
-      document.getElementById("back7").addEventListener("click", prevStep);
+      document.getElementById("back2")?.addEventListener("click", prevStep);
+      document.getElementById("back3")?.addEventListener("click", prevStep);
+      document.getElementById("back4")?.addEventListener("click", prevStep);
+      document.getElementById("back5")?.addEventListener("click", prevStep);
+      document.getElementById("back6")?.addEventListener("click", prevStep);
+      document.getElementById("back7")?.addEventListener("click", prevStep);
 
       // Shuffle wording + post
       document.getElementById("shuffleBtn").addEventListener("click", updatePreview);
