@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hair by Heather Wahl – Review Builder</title>
+
+  <style>
+    :root{
+      --bg1:#fb7185;
+      --bg2:#ec4899;
+      --card:#ffffff;
+      --ink:#111827;
+      --muted:#6b7280;
+      --brand:#ec4899;
+      --brand-soft:#fce7f3;
+      --border:#e5e7eb;
+      --radius:18px;
+      --shadow:0 14px 40px rgba(15,23,42,.18),0 3px 10px rgba(15,23,42,.10);
+      --ok:#22c55e;
+      --error:#ef4444;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+
+    html,body{
+      min-height:100vh;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif;
+      color:var(--ink);
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      background-attachment:fixed;
+    }
+
+    body{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:880px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    header{
+      text-align:center;
+      color:#ffe4f4;
+    }
+    header .brand{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-bottom:4px;
+    }
+
+    /* Integrated logo badge – rounded, subtle white background, shadow */
+    header img.logo{
+      height:80px;
+      width:auto;
+      object-fit:contain;
+      border-radius:24px;
+      background:#ffffff;
+      padding:6px 14px;
+      box-shadow:0 12px 30px rgba(15,23,42,.35);
+    }
+
+    header h1{
+      margin:10px 0 4px;
+      font-size:clamp(22px,4vw,32px);
+      font-weight:800;
+    }
+    header p{
+      margin:0;
+      font-size:14px;
+      color:#ffe4f4;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:20px 18px 16px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:saturate(1.2) blur(4px);
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .progress{
+      flex:1;
+      height:10px;
+      background:#fdf2ff;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar{
+      height:100%;
+      width:0;
+      background:linear-gradient(90deg,var(--brand),#f97316);
+      transition:width .25s ease;
+    }
+    .count{
+      min-width:120px;
+      text-align:right;
+      font-weight:800;
+      font-size:13px;
+      color:#374151;
+    }
+
+    .step{
+      display:none;
+      animation:fade .22s ease;
+    }
+    .step.active{
+      display:block;
+    }
+
+    @keyframes fade{
+      from{opacity:0;transform:translateY(4px);}
+      to{opacity:1;transform:none;}
+    }
+
+    .step-header{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .step-number{
+      width:26px;
+      height:26px;
+      border-radius:999px;
+      background:var(--brand-soft);
+      color:var(--brand);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      font-size:13px;
+      flex-shrink:0;
+    }
+    .step-header h2{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:#0f172a;
+    }
+    .step-description{
+      margin:2px 0 0;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .question-container{
+      margin:6px 0 4px;
+    }
+
+    textarea,
+    input[type="text"]{
+      width:100%;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      font-size:14px;
+      font-family:inherit;
+      transition:all .18s ease;
+      background:#f9fafb;
+      color:var(--ink);
+    }
+    textarea:focus,
+    input[type="text"]:focus{
+      outline:none;
+      border-color:var(--brand);
+      box-shadow:0 0 0 2px rgba(236,72,153,.22);
+      background:#ffffff;
+    }
+
+    textarea{
+      min-height:180px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    .options-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:8px;
+      margin-top:4px;
+    }
+
+    .option-card{
+      display:block;
+      border-radius:12px;
+      padding:10px;
+      border:1px solid var(--border);
+      cursor:pointer;
+      transition:all .18s ease;
+      background:#ffffff;
+    }
+
+    .option-card:hover{
+      border-color:var(--brand);
+      box-shadow:0 4px 14px rgba(15,23,42,.06);
+      transform:translateY(-1px);
+    }
+
+    .option-card input{
+      display:none;
+    }
+
+    .option-card.selected{
+      border-color:var(--brand);
+      background:var(--brand-soft);
+    }
+
+    .option-content{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      font-size:13px;
+      color:#0f172a;
+    }
+    .option-icon{
+      font-size:18px;
+      line-height:1;
+      margin-top:1px;
+    }
+    .option-text{
+      font-weight:500;
+    }
+
+    .step-actions{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:14px;
+    }
+
+    .btn{
+      appearance:none;
+      border-radius:12px;
+      padding:11px 14px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      min-height:40px;
+      white-space:nowrap;
+      transition:all .18s ease;
+    }
+    .btn.primary{
+      background:var(--brand);
+      border-color:var(--brand);
+      color:#ffffff;
+      box-shadow:0 4px 14px rgba(236,72,153,.35);
+    }
+    .btn.ghost{
+      background:#ffffff;
+      color:#0f172a;
+    }
+    .btn:hover:not(:disabled){
+      transform:translateY(-1px);
+      box-shadow:0 6px 18px rgba(15,23,42,.14);
+    }
+    .btn.primary:hover:not(:disabled){
+      background:#db2777;
+      border-color:#db2777;
+    }
+    .btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none;
+    }
+
+    .banner{
+      display:none;
+      margin-top:10px;
+      padding:9px 10px;
+      border-radius:10px;
+      font-size:12px;
+    }
+    .banner.ok{
+      background:rgba(22,163,74,.08);
+      color:#15803d;
+      border:1px solid rgba(22,163,74,.35);
+    }
+    .banner.error{
+      background:rgba(239,68,68,.06);
+      color:#b91c1c;
+      border:1px solid rgba(239,68,68,.35);
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      font-size:10px;
+      font-weight:600;
+      color:#4b5563;
+      background:#f9fafb;
+      gap:4px;
+    }
+    .steps{
+      margin-top:6px;
+      padding-left:16px;
+      font-size:11px;
+      color:#6b7280;
+    }
+    .steps li{
+      margin-bottom:4px;
+    }
+
+    @media (max-width:640px){
+      body{
+        padding:12px;
+        align-items:flex-start;
+      }
+      .card{padding:14px;}
+      .step-actions{
+        flex-wrap:wrap;
+      }
+      .step-actions .btn.primary{
+        flex:1 0 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Favicon helper
+    (function(){
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.type = 'image/x-icon';
+      link.href = (window.location.origin || '') + '/favicon.ico';
+      document.head.appendChild(link);
+    })();
+  </script>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <!-- Swap this src with your final logo file if you host it locally -->
+        <img class="logo" src="https://i.ibb.co/KpL7XnGs/Gemini-Generated-Image-wtu0wqwtu0wqwtu0.png" alt="Hair by Heather Wahl logo" onerror="this.style.display='none'">
+      </div>
+      <h1>Share Your Visit with Heather</h1>
+      <p>Answer a few quick questions and we’ll auto-build a polished, 5★-ready review you can post on Vagaro.</p>
+    </header>
+
+    <section class="card" id="wizard" aria-live="polite">
+      <div class="topbar" aria-hidden="true">
+        <div class="progress"><div class="bar" id="progressFill"></div></div>
+        <div class="count" id="progressText">Step 1 of 7</div>
+      </div>
+
+      <!-- STEP 1: SERVICE TYPE -->
+      <div class="step active" id="step1">
+        <div class="step-header">
+          <div class="step-number">1</div>
+          <div>
+            <h2>What did Heather do for your hair today?</h2>
+            <p class="step-description">Choose the main service you’re reviewing.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="radio" name="program" value="haircut" class="tag">
+              <div class="option-content">
+                <div class="option-icon">✂️</div>
+                <div class="option-text">Haircut / trim</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="program" value="color" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🎨</div>
+                <div class="option-text">Color / root touch-up</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="program" value="highlights" class="tag">
+              <div class="option-content">
+                <div class="option-icon">✨</div>
+                <div class="option-text">Highlights / balayage</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="program" value="styling" class="tag">
+              <div class="option-content">
+                <div class="option-icon">💁‍♀️</div>
+                <div class="option-text">Blowout / styling</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="program" value="treatment" class="tag">
+              <div class="option-content">
+                <div class="option-icon">💆‍♀️</div>
+                <div class="option-text">Treatment (mask, gloss, etc.)</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="program" value="other-service" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🌟</div>
+                <div class="option-text">Something else</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="step-actions">
+          <span></span>
+          <button class="btn primary" id="next1" disabled>Next ▶</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: HAIR RESULT -->
+      <div class="step" id="step2">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <div>
+            <h2>How did your hair turn out?</h2>
+            <p class="step-description">Select at least one option.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="checkbox" value="cut-finish" class="tag">
+              <div class="option-content">
+                <div class="option-icon">😍</div>
+                <div class="option-text">Obsessed with the cut/shape</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="color-finish" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🌈</div>
+                <div class="option-text">Love the color and dimension</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="nailed-it" class="tag">
+              <div class="option-content">
+                <div class="option-icon">✅</div>
+                <div class="option-text">Exactly what I asked Heather for</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="exceeded" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🤩</div>
+                <div class="option-text">Even better than I imagined</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="healthy" class="tag">
+              <div class="option-content">
+                <div class="option-icon">💖</div>
+                <div class="option-text">My hair feels healthy and refreshed</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn ghost" id="back2">◀ Back</button>
+          <button class="btn primary" id="next2" disabled>Next ▶</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: HEATHER EXPERIENCE -->
+      <div class="step" id="step3">
+        <div class="step-header">
+          <div class="step-number">3</div>
+          <div>
+            <h2>How was your experience with Heather?</h2>
+            <p class="step-description">Select at least one option.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="checkbox" value="listened" class="tag">
+              <div class="option-content">
+                <div class="option-icon">👂</div>
+                <div class="option-text">Heather really listened and asked great questions</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="consultation" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🗣️</div>
+                <div class="option-text">Heather talked through options and was honest about what would work best</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="education" class="tag">
+              <div class="option-content">
+                <div class="option-icon">📚</div>
+                <div class="option-text">Heather explained products and how to style my hair at home</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="friendly" class="tag">
+              <div class="option-content">
+                <div class="option-icon">😊</div>
+                <div class="option-text">Heather is warm, friendly, and easy to talk to</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="professional" class="tag">
+              <div class="option-content">
+                <div class="option-icon">⏱️</div>
+                <div class="option-text">Heather is professional and respectful of my time</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn ghost" id="back3">◀ Back</button>
+          <button class="btn primary" id="next3" disabled>Next ▶</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: SALON ENVIRONMENT -->
+      <div class="step" id="step4">
+        <div class="step-header">
+          <div class="step-number">4</div>
+          <div>
+            <h2>How was the salon environment?</h2>
+            <p class="step-description">Select at least one option.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="checkbox" value="clean" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🧼</div>
+                <div class="option-text">Clean, tidy, and well-maintained space</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="cozy" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🕯️</div>
+                <div class="option-text">Cozy, relaxing, and stylish atmosphere</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="music" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🎶</div>
+                <div class="option-text">Loved the music and overall vibe</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="comfort" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🛋️</div>
+                <div class="option-text">Chairs and shampoo bowl were comfortable</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="perks" class="tag">
+              <div class="option-content">
+                <div class="option-icon">☕</div>
+                <div class="option-text">Nice little touches (drinks, extras, etc.)</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn ghost" id="back4">◀ Back</button>
+          <button class="btn primary" id="next4" disabled>Next ▶</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: BOOKING & OVERALL EXPERIENCE -->
+      <div class="step" id="step5">
+        <div class="step-header">
+          <div class="step-number">5</div>
+          <div>
+            <h2>How was the overall visit?</h2>
+            <p class="step-description">Select at least one option.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="checkbox" value="on-time" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🕒</div>
+                <div class="option-text">My appointment started on time and flowed smoothly</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="communication" class="tag">
+              <div class="option-content">
+                <div class="option-icon">💬</div>
+                <div class="option-text">Great communication and confirmations/reminders</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="confident" class="tag">
+              <div class="option-content">
+                <div class="option-icon">💃</div>
+                <div class="option-text">Left feeling confident and put-together</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="returning" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🔁</div>
+                <div class="option-text">I’ll definitely be back to see Heather</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn ghost" id="back5">◀ Back</button>
+          <button class="btn primary" id="next5" disabled>Next ▶</button>
+        </div>
+      </div>
+
+      <!-- STEP 6: RECOMMENDATION -->
+      <div class="step" id="step6">
+        <div class="step-header">
+          <div class="step-number">6</div>
+          <div>
+            <h2>Would you recommend Heather?</h2>
+            <p class="step-description">Choose the option that fits best.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="radio" name="recommendation" value="recommend" class="tag">
+              <div class="option-content">
+                <div class="option-icon">⭐</div>
+                <div class="option-text">I’d absolutely recommend Heather to friends and family</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="recommendation" value="go-to" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🏠</div>
+                <div class="option-text">Heather is my new go-to for hair</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="recommendation" value="special" class="tag">
+              <div class="option-content">
+                <div class="option-icon">🎉</div>
+                <div class="option-text">Heather is perfect for special-occasion hair</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn ghost" id="back6">◀ Back</button>
+          <button class="btn primary" id="next6" disabled>Next ▶</button>
+        </div>
+      </div>
+
+      <!-- STEP 7: REVIEW PREVIEW -->
+      <div class="step" id="step7">
+        <div class="step-header">
+          <div class="step-number">7</div>
+          <div>
+            <h2>Your review about Heather is ready!</h2>
+            <p class="step-description">You can edit anything below. Then copy & post directly to Vagaro.</p>
+          </div>
+        </div>
+        <div class="question-container">
+          <textarea id="review" placeholder="Your review will appear here."></textarea>
+        </div>
+        <div class="step-actions">
+          <button class="btn ghost" id="back7">◀ Back to edit</button>
+          <button class="btn ghost" id="shuffleBtn">🔄 Shuffle wording</button>
+          <button class="btn primary" id="postBtn">📝 Copy & open Vagaro</button>
+        </div>
+        <div id="okBanner" class="banner ok"></div>
+        <div id="errBanner" class="banner error"></div>
+        <div style="margin-top:8px;">
+          <span class="pill">How to post</span>
+          <ol class="steps">
+            <li>Click <strong>Copy & open Vagaro</strong>.</li>
+            <li>In the new tab, click to <strong>leave a review</strong> for Hair by Heather Wahl.</li>
+            <li><strong>Paste</strong> your text (Ctrl+V / Cmd+V).</li>
+            <li>Choose your stars (hopefully ⭐⭐⭐⭐⭐!) and click <strong>Submit</strong>.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const SALON_NAME = "Hair by Heather Wahl";
+    const VAGARO_URL = "https://www.vagaro.com/hairbyheatherwahlcom?fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnXL1GkKCEzRoVsy-UdN-obeP105pLroNyCRYY8arOCG7VdKloB3mso3sBzxI_aem_nrLw7JRde8QlRpl0Wie69w";
+
+    const OPENERS = [
+      "I had my hair done by Heather and it was a great experience.",
+      "My latest appointment with Heather was fantastic from start to finish.",
+      "I’m really happy with how my hair turned out after seeing Heather.",
+      "Heather always takes such good care of my hair.",
+      "From start to finish, Heather made the whole visit comfortable and enjoyable."
+    ];
+
+    const CLOSERS_5 = [
+      "I highly recommend Heather to anyone looking for a stylist they can truly trust.",
+      "If you’re thinking about booking with Heather, go for it — you’ll be glad you did.",
+      "I’m already looking forward to my next appointment with Heather.",
+      "Five stars for Heather — I couldn’t be happier with my hair.",
+      "Heather is absolutely worth the visit for beautiful, personalized hair."
+    ];
+
+    // Tag -> sentence variations
+    const TAG_VARIATIONS = {
+      // Service types (program)
+      haircut: [
+        "I came in for a haircut and absolutely love the shape and movement Heather gave my hair.",
+        "The cut Heather gave me is flattering, modern, and exactly what I was hoping for.",
+        "My hair feels lighter, healthier, and perfectly shaped after Heather’s cut."
+      ],
+      color: [
+        "Heather did my color and the shade turned out beautiful and rich.",
+        "The color Heather created is seamless and looks so natural and shiny.",
+        "My roots and overall tone look fresh and well blended thanks to Heather."
+      ],
+      highlights: [
+        "The highlights and balayage Heather did are soft, dimensional, and perfectly placed.",
+        "The blend of color Heather created looks sun-kissed and natural, not streaky at all.",
+        "I love the dimension and brightness in my hair after Heather’s highlights."
+      ],
+      styling: [
+        "Heather’s blowout and styling left my hair smooth, bouncy, and put-together.",
+        "I left with my hair styled exactly how I like to wear it.",
+        "Heather’s styling held up really well even after I left the salon."
+      ],
+      treatment: [
+        "The treatment Heather used left my hair feeling silky, hydrated, and revived.",
+        "My hair feels noticeably softer and healthier after the treatment Heather recommended.",
+        "The treatment Heather did was exactly what my hair needed — it feels renewed."
+      ],
+      "other-service": [
+        "The service Heather provided was personalized and tailored to what my hair needed.",
+        "I really appreciated how Heather customized everything for my hair type and goals.",
+        "Overall, the service felt thoughtful, detailed, and very personal to my hair."
+      ],
+
+      // Hair result
+      "cut-finish": [
+        "The cut flatters my face and has great movement.",
+        "The shape of the cut really suits me.",
+        "It’s one of the best haircuts I’ve had in a long time."
+      ],
+      "color-finish": [
+        "The color and dimension look gorgeous and really bring my hair to life.",
+        "The blend of tones is beautiful and looks very natural.",
+        "I’ve already gotten compliments on how pretty my color looks."
+      ],
+      "nailed-it": [
+        "The result was exactly what I described during my consultation with Heather.",
+        "Heather truly nailed what I had in mind, down to the little details.",
+        "The finished look matches my inspiration photos in the best way."
+      ],
+      "exceeded": [
+        "It turned out even better than I pictured when I booked the appointment.",
+        "The change feels like a big upgrade in the best way.",
+        "The final look genuinely exceeded my expectations."
+      ],
+      "healthy": [
+        "My hair feels healthier, softer, and less dry.",
+        "Even after color and styling, my hair still feels nourished and strong.",
+        "You can tell Heather is mindful about keeping the hair healthy."
+      ],
+
+      // Heather experience
+      listened: [
+        "Heather took the time to really listen to what I wanted.",
+        "I never felt rushed — Heather asked great questions and clarified my goals.",
+        "I felt very comfortable explaining what I like and don’t like with Heather."
+      ],
+      consultation: [
+        "Heather was honest and realistic about what would work best for my hair.",
+        "She walked me through different options and helped me choose the best one.",
+        "Heather balanced my ideas with what would be healthiest for my hair."
+      ],
+      education: [
+        "Heather explained how to style my hair at home in a way that felt easy to follow.",
+        "I left with tips on products and techniques from Heather that actually make sense for me.",
+        "Heather was happy to answer questions and share styling advice."
+      ],
+      friendly: [
+        "The time in Heather’s chair was warm, friendly, and relaxed.",
+        "It felt like catching up with a friend while getting my hair done.",
+        "Conversation with Heather was easy, and I felt at ease the whole time."
+      ],
+      professional: [
+        "The whole appointment with Heather felt professional, respectful, and well-timed.",
+        "I appreciated that Heather stayed on schedule without rushing.",
+        "Everything was handled in a calm, organized, professional way."
+      ],
+
+      // Salon environment
+      clean: [
+        "The salon itself is clean, tidy, and clearly well cared for.",
+        "Everything from the stations to the shampoo area felt spotless.",
+        "You can tell a lot of attention is paid to keeping the space clean."
+      ],
+      cozy: [
+        "The space feels cozy, relaxing, and really well decorated.",
+        "It has a calm, welcoming vibe that makes it easy to unwind.",
+        "The overall atmosphere feels chic yet comfortable."
+      ],
+      music: [
+        "The music and vibe were on point — not too loud, just fun.",
+        "The playlist and overall energy made the appointment fly by.",
+        "The atmosphere felt upbeat without being overwhelming."
+      ],
+      comfort: [
+        "The chairs and shampoo bowl were comfortable, which makes a big difference.",
+        "Even during longer services, I felt physically comfortable the whole time.",
+        "Little comforts in the chair made the visit feel extra relaxing."
+      ],
+      perks: [
+        "I loved the little touches like drinks and small extras.",
+        "Those extra touches made it feel like a mini self-care day.",
+        "You can tell thought went into all the small details."
+      ],
+
+      // Overall visit
+      "on-time": [
+        "My appointment started on time and the service flowed smoothly.",
+        "I appreciated that there wasn’t a long wait once I arrived.",
+        "Timing was handled really well, which I definitely value."
+      ],
+      communication: [
+        "Communication and reminders were clear and helpful.",
+        "Confirmations and reminders made it easy to keep track of my appointment.",
+        "Any questions I had were answered quickly and kindly."
+      ],
+      confident: [
+        "I left feeling confident, polished, and really good about my hair.",
+        "I walked out feeling like the best version of myself.",
+        "It’s the kind of hair that makes you want to take a picture on the way home."
+      ],
+      returning: [
+        "I’m already planning on coming back to see Heather again.",
+        "It feels great to know I have Heather to go to for my hair.",
+        "This is definitely someone I can see myself returning to regularly."
+      ],
+
+      // Recommendation
+      recommend: [
+        "I would absolutely recommend Heather to friends and family.",
+        "I’ve already told people they should book with Heather.",
+        "It’s easy for me to recommend Heather because my experience was so positive."
+      ],
+      "go-to": [
+        "I’ve definitely found my new go-to stylist in Heather.",
+        "It feels good to know I finally have Heather to stick with for my hair.",
+        "Heather is someone I trust with my hair now."
+      ],
+      special: [
+        "Heather is a great choice for special-occasion hair that still feels like “you”.",
+        "I’d happily come back to Heather for any big event or celebration.",
+        "If you need hair for a special moment, Heather is a wonderful person to see."
+      ]
+    };
+
+    // Group tags so we only pick one sentence per theme to avoid repetition
+    const TAG_GROUPS = {
+      // service
+      haircut:"service",
+      color:"service",
+      highlights:"service",
+      styling:"service",
+      treatment:"service",
+      "other-service":"service",
+
+      // hair result
+      "cut-finish":"result",
+      "color-finish":"result",
+      "nailed-it":"result",
+      "exceeded":"result",
+      "healthy":"result",
+
+      // heather experience
+      listened:"heather",
+      consultation:"heather",
+      education:"heather",
+      friendly:"heather",
+      professional:"heather",
+
+      // environment
+      clean:"environment",
+      cozy:"environment",
+      music:"environment",
+      comfort:"environment",
+      perks:"environment",
+
+      // visit / feelings
+      "on-time":"visit",
+      communication:"visit",
+      confident:"visit",
+      returning:"visit",
+
+      // recommendation
+      recommend:"recommend",
+      "go-to":"recommend",
+      special:"recommend"
+    };
+
+    function sample(arr){
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function uniquePush(arr, text){
+      const t = (text || "").trim();
+      if(!t) return;
+      if(!arr.includes(t)) arr.push(t);
+    }
+
+    function joinSentences(lines){
+      const cleaned = (lines || [])
+        .map(l => (l || "").trim())
+        .filter(Boolean)
+        .map(l => {
+          l = l.replace(/\s+/g, " ");
+          return /[.!?]$/.test(l) ? l : l + ".";
+        });
+      return cleaned.join(" ");
+    }
+
+    function shuffleContainerChildren(selector){
+      const parent = document.querySelector(selector);
+      if(!parent) return;
+      const children = Array.from(parent.children);
+      if(children.length <= 1) return;
+      for(let i = children.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [children[i], children[j]] = [children[j], children[i]];
+      }
+      children.forEach(child => parent.appendChild(child));
+    }
+
+    async function copyToClipboard(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch(e){
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      }
+    }
+
+    function showOk(msg){
+      const el = document.getElementById("okBanner");
+      el.textContent = msg || "Copied! In the Vagaro tab, paste your review, pick your rating, and submit. ✨";
+      el.style.display = "block";
+      setTimeout(()=>{ el.style.display = "none"; }, 4000);
+    }
+
+    function showErr(msg){
+      const el = document.getElementById("errBanner");
+      el.textContent = msg || "Something went wrong. Please try again.";
+      el.style.display = "block";
+      setTimeout(()=>{ el.style.display = "none"; }, 5000);
+    }
+
+    function buildReviewText(){
+      const opener = sample(OPENERS);
+      const middle = [];
+
+      // Collect selected tags
+      const selected = new Set();
+      document.querySelectorAll(".tag").forEach(input => {
+        if((input.type === "checkbox" || input.type === "radio") && input.checked){
+          selected.add(input.value);
+        }
+      });
+
+      const groupsUsed = new Set();
+      const maxDetailSentences = 3;
+
+      // Service sentence first (if chosen)
+      const programVal = document.querySelector('input[name="program"]:checked')?.value;
+      if(programVal && TAG_VARIATIONS[programVal]){
+        const serviceSentence = sample(TAG_VARIATIONS[programVal]);
+        uniquePush(middle, serviceSentence);
+        groupsUsed.add("service");
+      }
+
+      // Other selected tags, at most one sentence per group
+      const selectedArray = Array.from(selected);
+      shuffleArray(selectedArray); // vary order a bit
+
+      for(const tag of selectedArray){
+        if(tag === programVal) continue; // already handled
+
+        const group = TAG_GROUPS[tag] || tag;
+        if(groupsUsed.has(group)) continue;
+        if(!TAG_VARIATIONS[tag]) continue;
+
+        const sentence = sample(TAG_VARIATIONS[tag]);
+        uniquePush(middle, sentence);
+        groupsUsed.add(group);
+
+        if(middle.length >= maxDetailSentences) break;
+      }
+
+      const closer = sample(CLOSERS_5);
+      const all = [opener, ...middle, closer];
+
+      return joinSentences(all);
+    }
+
+    function updatePreview(){
+      const ta = document.getElementById("review");
+      ta.value = buildReviewText();
+    }
+
+    async function postOnVagaro(){
+      const text = (document.getElementById("review").value || "").trim();
+
+      if(!text){
+        showErr("Use the steps above to build your review first.");
+        return;
+      }
+
+      const ok = await copyToClipboard(text);
+      if(!ok){
+        showErr("Couldn’t copy automatically. Please copy the text manually before posting.");
+        return;
+      }
+
+      window.open(VAGARO_URL, "_blank", "noopener");
+      showOk("Copied! In the Vagaro tab, paste your review, pick your rating, and submit. ✨");
+    }
+
+    let currentStep = 1;
+    const totalSteps = 7;
+
+    function updateProgressUI(){
+      const pct = (currentStep / totalSteps) * 100;
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressText").textContent = "Step " + currentStep + " of " + totalSteps;
+    }
+
+    function showStep(step){
+      document.querySelectorAll(".step").forEach(s => {
+        s.classList.remove("active");
+        s.style.display = "none";
+      });
+      const el = document.getElementById("step" + step);
+      if(el){
+        el.style.display = "block";
+        requestAnimationFrame(() => el.classList.add("active"));
+      }
+      currentStep = step;
+      updateProgressUI();
+    }
+
+    function nextStep(){
+      if(currentStep < totalSteps){
+        const target = currentStep + 1;
+        if(target === 7){
+          updatePreview();
+        }
+        showStep(target);
+      }
+    }
+
+    function prevStep(){
+      if(currentStep > 1){
+        showStep(currentStep - 1);
+      }
+    }
+
+    function requireSelection(stepSelector, nextId){
+      const stepEl = document.querySelector(stepSelector);
+      const nextBtn = document.getElementById(nextId);
+      if(!stepEl || !nextBtn) return;
+
+      function check(){
+        const anyChecked = stepEl.querySelector('input[type="checkbox"]:checked, input[type="radio"]:checked');
+        nextBtn.disabled = !anyChecked;
+      }
+
+      check();
+      stepEl.addEventListener("change", check);
+    }
+
+    (function init(){
+      shuffleContainerChildren("#step1 .options-grid");
+      shuffleContainerChildren("#step2 .options-grid");
+      shuffleContainerChildren("#step3 .options-grid");
+      shuffleContainerChildren("#step4 .options-grid");
+      shuffleContainerChildren("#step5 .options-grid");
+      shuffleContainerChildren("#step6 .options-grid");
+
+      // Require at least one choice for steps 1–6
+      requireSelection("#step1", "next1");
+      requireSelection("#step2", "next2");
+      requireSelection("#step3", "next3");
+      requireSelection("#step4", "next4");
+      requireSelection("#step5", "next5");
+      requireSelection("#step6", "next6");
+
+      // Next buttons
+      document.getElementById("next1").addEventListener("click", nextStep);
+      document.getElementById("next2").addEventListener("click", nextStep);
+      document.getElementById("next3").addEventListener("click", nextStep);
+      document.getElementById("next4").addEventListener("click", nextStep);
+      document.getElementById("next5").addEventListener("click", nextStep);
+      document.getElementById("next6").addEventListener("click", () => { updatePreview(); nextStep(); });
+
+      // Back buttons
+      document.getElementById("back2").addEventListener("click", prevStep);
+      document.getElementById("back3").addEventListener("click", prevStep);
+      document.getElementById("back4").addEventListener("click", prevStep);
+      document.getElementById("back5").addEventListener("click", prevStep);
+      document.getElementById("back6").addEventListener("click", prevStep);
+      document.getElementById("back7").addEventListener("click", prevStep);
+
+      // Shuffle wording + post
+      document.getElementById("shuffleBtn").addEventListener("click", updatePreview);
+      document.getElementById("postBtn").addEventListener("click", postOnVagaro);
+
+      // Visual selection states
+      function updateSelectionVisuals(){
+        document.querySelectorAll(".option-card").forEach(card => {
+          const input = card.querySelector("input");
+          card.classList.toggle("selected", !!(input && input.checked));
+        });
+      }
+      document.addEventListener("change", e => {
+        if(e.target.matches("input")){
+          updateSelectionVisuals();
+        }
+      });
+      document.addEventListener("click", e => {
+        if(e.target.closest(".option-card")){
+          updateSelectionVisuals();
+        }
+      });
+
+      showStep(1);
+    })();
+  </script>
+
+  <script type="text/javascript" src="/unprotected/back_to_spaceship.js"></script>
+  <script type="text/javascript" src="/unprotected/back_to_spaceship.js?hash=4975d460e508829e8fb64d3962bc44ad35f3a95a"></script>
+</body>
+</html>
